@@ -113,11 +113,33 @@ _None recorded yet._
 
 ---
 
-## Development Rules  [TO BE FILLED]
+## Development Rules
 
 > Binding architectural rules, each numbered and sourced. Referenced by number in TODO items and commit messages.
 
-_Not yet filled — update before the first session._
+**DR-1 — Server-authoritative game state.**
+All game rules (turn order, coordinate bounds, win condition, ship placement validity) are enforced on the server. The client is never trusted to report game outcomes or validate its own moves.
+
+**DR-2 — Input validation at every boundary.**
+All REST request bodies use Pydantic models. All WebSocket messages are validated with Pydantic before any logic runs — malformed or unexpected messages are dropped with an error response, never acted on.
+
+**DR-3 — Cryptographic randomness for all tokens.**
+Lobby codes and player IDs are generated with Python's `secrets` module. `random` is never used for security-sensitive values.
+
+**DR-4 — Opponent state is never leaked.**
+Ship positions are never sent to the opposing player. Only hit/miss/sunk results are broadcast. The `/state` REST endpoint returns only the requesting player's own view.
+
+**DR-5 — Sanitize all user-supplied strings.**
+Usernames: max 20 characters, alphanumeric + spaces only, stripped of leading/trailing whitespace on the server. Any string that fails validation is rejected before it touches game or lobby state.
+
+**DR-6 — WebSocket connections are authenticated before acceptance.**
+A WS connection is rejected (close code 4001) if the `player_id` path parameter does not match an existing player in the named lobby. No anonymous or unauthenticated WS connections.
+
+**DR-7 — CORS is restrictive.**
+`allow_origins` is set from the `ALLOWED_ORIGINS` environment variable. Default in dev: `["http://localhost:5173"]`. Never `["*"]` in production.
+
+**DR-8 — No internal error detail in client responses.**
+Unhandled server-side exceptions are caught and return generic error messages. Stack traces and internal state are never sent to the client.
 
 ---
 

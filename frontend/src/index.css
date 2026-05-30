@@ -1,0 +1,145 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #0d1b2a;
+  color: #e0e0e0;
+  min-height: 100vh;
+}
+
+h1, h2, h3 { color: #4fc3f7; }
+
+button {
+  cursor: pointer;
+  padding: 8px 18px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: opacity 0.15s, background 0.15s;
+}
+button:disabled { opacity: 0.4; cursor: not-allowed; }
+button.primary   { background: #0288d1; color: #fff; }
+button.primary:hover:not(:disabled)   { background: #0277bd; }
+button.secondary { background: #37474f; color: #e0e0e0; }
+button.secondary:hover:not(:disabled) { background: #455a64; }
+
+input {
+  padding: 9px 12px;
+  border-radius: 6px;
+  border: 1px solid #37474f;
+  background: #1a2a3a;
+  color: #e0e0e0;
+  font-size: 14px;
+  outline: none;
+  width: 100%;
+}
+input:focus { border-color: #0288d1; }
+
+.error-msg  { color: #ef5350; font-size: 13px; margin-top: 6px; }
+.status-msg { color: #4fc3f7; font-size: 13px; margin-top: 6px; }
+
+/* ── Lobby ── */
+.lobby {
+  max-width: 420px;
+  margin: 80px auto;
+  padding: 0 16px;
+  text-align: center;
+}
+.lobby h1 { font-size: 48px; letter-spacing: 8px; margin-bottom: 8px; }
+.lobby-subtitle { color: #78909c; margin-bottom: 32px; font-size: 14px; }
+.lobby-card {
+  background: #132035;
+  border-radius: 12px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: left;
+}
+.lobby-card label { font-size: 12px; color: #90a4ae; text-transform: uppercase; letter-spacing: 1px; }
+.lobby-row { display: flex; gap: 8px; align-items: stretch; }
+.lobby-row input { flex: 1; }
+.lobby-divider { color: #546e7a; font-size: 12px; text-align: center; padding: 4px 0; }
+
+/* ── Game: waiting ── */
+.game-waiting {
+  max-width: 440px;
+  margin: 100px auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0 16px;
+}
+.lobby-code {
+  font-family: monospace;
+  font-size: 36px;
+  letter-spacing: 6px;
+  color: #ffb74d;
+  background: #132035;
+  padding: 12px 24px;
+  border-radius: 8px;
+  display: inline-block;
+}
+.copy-hint { font-size: 12px; color: #546e7a; }
+
+/* ── Game: placement ── */
+.game-placement {
+  max-width: 960px;
+  margin: 32px auto;
+  padding: 0 16px;
+}
+.game-placement h2 { margin-bottom: 4px; }
+
+/* ── ShipYard ── */
+.shipyard { display: flex; gap: 32px; align-items: flex-start; flex-wrap: wrap; margin-top: 16px; }
+.shipyard-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 190px;
+}
+.shipyard-panel h3 { margin-bottom: 4px; }
+.ship-item {
+  padding: 9px 12px;
+  background: #132035;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  font-size: 13px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: border-color 0.12s;
+}
+.ship-item:hover:not(.ship-placed):not(.ship-disabled) { border-color: #0288d1; }
+.ship-selected  { border-color: #0288d1 !important; background: #0d2137; }
+.ship-placed    { opacity: 0.55; cursor: default; }
+.ship-placed .ship-check { color: #66bb6a; }
+.ship-disabled  { cursor: default; }
+.orient-row     { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+.orient-row button { font-size: 12px; padding: 5px 10px; flex: 1; }
+
+/* ── Game: in progress ── */
+.game-board {
+  max-width: 960px;
+  margin: 32px auto;
+  padding: 0 16px;
+}
+.game-status {
+  font-size: 18px;
+  font-weight: 600;
+  color: #4fc3f7;
+  margin-bottom: 24px;
+  text-align: center;
+  min-height: 28px;
+}
+.boards { display: flex; gap: 48px; justify-content: center; flex-wrap: wrap; }
+.game-over-banner {
+  text-align: center;
+  font-size: 22px;
+  font-weight: 700;
+  margin: 20px 0;
+  color: #ffb74d;
+}
