@@ -1,3 +1,4 @@
+import asyncio
 import json
 import os
 
@@ -112,15 +113,27 @@ async def ws_endpoint(ws: WebSocket, lobby_code: str, player_id: str) -> None:
         "username": lobby.players[player_id].username,
     })
 
-    # If both players are now connected, begin placement phase
+    # If both players are now connected, sync game state
     if opponent_id and ws_manager.is_connected(opponent_id):
         my_name = lobby.players[player_id].username
         opp_name = lobby.players[opponent_id].username
         await ws_manager.send(player_id, EVT_OPPONENT_JOINED, {"username": opp_name})
         await ws_manager.send(opponent_id, EVT_OPPONENT_JOINED, {"username": my_name})
+
         if lobby.status == LobbyStatus.PLAYERS_JOINED:
             lobby_manager.start_placement(lobby_code)
             await ws_manager.broadcast(player_ids, EVT_PLACEMENT_PHASE, {})
+        elif lobby.status == LobbyStatus.SHIP_PLACEMENT:
+            # Reconnect during placement — resync the reconnecting player
+            await ws_manager.send(player_id, EVT_PLACEMENT_PHASE, {})
+        elif lobby.status == LobbyStatus.IN_PROGRESS and lobby.engine:
+            # Reconnect mid-game — resync current state
+            await ws_manager.send(player_id, EVT_GAME_START, {
+                "first_turn": lobby.engine.state.current_turn,
+                "players": {pid: lobby.players[pid].username for pid in player_ids},
+            })
+            if lobby.engine.state.current_turn == player_id:
+                await ws_manager.send(player_id, EVT_YOUR_TURN, {})
 
     try:
         while True:
@@ -148,7 +161,12 @@ async def ws_endpoint(ws: WebSocket, lobby_code: str, player_id: str) -> None:
     except WebSocketDisconnect:
         ws_manager.disconnect(player_id)
         if opponent_id and ws_manager.is_connected(opponent_id):
-            await ws_manager.send(opponent_id, EVT_OPPONENT_DISCONNECTED, {})
+            # Short grace period: lets the client reconnect before we declare them gone.
+            # This prevents React StrictMode's cleanup+remount cycle from falsely
+            # triggering opponent_disconnected during development.
+            await asyncio.sleep(0.5)
+            if not ws_manager.is_connected(player_id):
+                await ws_manager.send(opponent_id, EVT_OPPONENT_DISCONNECTED, {})
 
 
 # ---------------------------------------------------------------------------

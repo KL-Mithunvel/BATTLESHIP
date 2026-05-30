@@ -18,7 +18,7 @@ function reducer(state, { type, data, playerID }) {
       return { ...state, phase: 'placement' }
 
     case 'opponent_joined':
-      return { ...state, opponentUsername: data.username }
+      return { ...state, opponentUsername: data.username, notification: null }
 
     case 'placement_confirmed':
       return { ...state, placementConfirmed: true }
